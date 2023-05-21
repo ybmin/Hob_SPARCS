@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'home.dart';
 
@@ -8,8 +9,9 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Material(
-      child: Text("initial page"),
+    return const MaterialApp(
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      home: Home(),
     );
   }
 }
