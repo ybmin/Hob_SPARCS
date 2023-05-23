@@ -39,10 +39,24 @@ class _UserInfom extends State<UserInfom> {
             }),
         body: Column(
           children: [
-            Image(image: null),
             Row(
-              children: [Text("Name"), Text("Id")],
-            )
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircleAvatar(
+                  child: Image(
+                    image: NetworkImage(
+                      "https://img.freepik.com/free-vector/id-card-concept-illustration_114360-1463.jpg",
+                    ),
+                    height: 300,
+                    fit: BoxFit.fitHeight,
+                  ),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [Text("Name"), Text("Id")],
+                )
+              ],
+            ),
           ],
         ));
   }

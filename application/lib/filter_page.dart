@@ -5,6 +5,6 @@ class filterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material();
+    return Material(type: MaterialType.canvas, child: Text("filter page"));
   }
 }

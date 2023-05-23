@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
+
 import 'package:hobSparcs/home.dart';
 import 'user_info.dart';
 import 'src/group.dart';
@@ -13,10 +16,21 @@ class GroupCreate extends StatefulWidget {
 }
 
 class _GroupCreate extends State<GroupCreate> {
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
+  static const cameraInitial = CameraPosition(
+      target: LatLng(36.374171854421185, 127.36037368774652), zoom: 15);
+
   @override
   Widget build(BuildContext context) {
-    GroupMeet newGroup = GroupMeet("", "", [DateTime.now()], 1, "", "");
+    final firestore = FirebaseFirestore.instance;
     int _index = 1;
+    String _title = "";
+    String _content = "";
+    List<DateTime?> _dates = [DateTime.now()];
+    int _maxGroup = 1;
+    String _tags = "";
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       bottomNavigationBar: BottomNavigationBar(
@@ -41,47 +55,98 @@ class _GroupCreate extends State<GroupCreate> {
                       UserInfom()));
             }
           }),
-      body: Column(children: [
-        const Text("소모임 만들기"),
-        //방  제목
-        SizedBox(
-          height: 30,
-          child: TextField(
-            key: null,
-            enabled: true,
-            onChanged: (title) => newGroup.title = title,
+      body: SingleChildScrollView(
+        child: Column(children: [
+          const Text("소모임 만들기", style: TextStyle(fontSize: 20)),
+          const SizedBox(
+            height: 15,
           ),
-        ),
-        //상세설명
-        SizedBox(
-          height: 30,
-          child: TextField(
-            onChanged: (content) => newGroup.content = content,
+          //방  제목
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              const Text("소모임 제목"),
+              SizedBox(
+                height: 30,
+                width: 250,
+                child: TextField(
+                  key: null,
+                  enabled: true,
+                  onChanged: (title) => _title = title,
+                ),
+              ),
+            ],
           ),
-        ),
-        //카테고리
-        //날짜
-        CalendarDatePicker2(
-          config: CalendarDatePicker2Config(
-            calendarType: CalendarDatePicker2Type.multi,
+          //상세설명
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+            const Text("모임 소개"),
+            SizedBox(
+              height: 100,
+              width: 250,
+              child: TextField(
+                expands: true,
+                maxLines: null,
+                minLines: null,
+                key: null,
+                enabled: true,
+                onChanged: (content) => _content = content,
+              ),
+            ),
+          ]),
+          //카테고리
+          //날짜
+          CalendarDatePicker2(
+            config: CalendarDatePicker2Config(
+              calendarType: CalendarDatePicker2Type.multi,
+            ),
+            value: _dates,
+            onValueChanged: (dates) => _dates = dates,
           ),
-          value: newGroup.dates,
-          onValueChanged: (dates) => newGroup.dates = dates,
-        ),
-        //위치
-        //태그
-        SizedBox(
-          height: 30,
-          child: TextField(
-            onChanged: (tags) => newGroup.tags = tags,
+          //위치
+          const Text("위치"),
+          SizedBox(
+            height: 300,
+            width: 300,
+            child: GoogleMap(
+              initialCameraPosition: cameraInitial,
+              onMapCreated: (GoogleMapController controller) {
+                _controller.complete(controller);
+              },
+            ),
           ),
-        ),
-        //등록
-        TextButton(
-          onPressed: () {},
-          child: const Text("소모임 생성"),
-        ),
-      ]),
+          //태그
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+            const Text("태그"),
+            SizedBox(
+              height: 30,
+              width: 250,
+              child: TextField(
+                onChanged: (tags) => _tags = tags,
+              ),
+            ),
+          ]),
+          //등록
+          TextButton(
+            onPressed: () {
+              GroupMeet newGroup = GroupMeet(
+                  title: _title,
+                  content: _content,
+                  dates: _dates,
+                  maxGroup: _maxGroup,
+                  lat: 0,
+                  lon: 0,
+                  tags: _tags);
+
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return const Dialog(child: Text("Create!!!"));
+                  });
+            },
+            child: const Text("소모임 생성"),
+          ),
+        ]),
+      ),
     );
   }
 }

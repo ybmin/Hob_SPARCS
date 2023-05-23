@@ -1,17 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterfire_ui/firestore.dart';
-import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'search.dart';
 import 'group_detail.dart';
 import 'group_create.dart';
 import 'user_info.dart';
 import 'filter_page.dart';
+import 'src/group.dart';
 
 //소그룹 리스트 항목 제공
 class GroupList extends StatelessWidget {
-  const GroupList({super.key});
+  const GroupList(GroupMeet gp, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +45,9 @@ class Home extends StatefulWidget {
 }
 
 class _Home extends State<Home> {
+  final firestore = FirebaseFirestore.instance;
   int _index = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,7 +94,12 @@ class _Home extends State<Home> {
                       color: Colors.blue,
                     )),
                 IconButton(
-                    onPressed: () {}, //필터링 연결(filter_page.dart)
+                    onPressed: () {
+                      Navigator.of(context).push(PageRouteBuilder(
+                          pageBuilder:
+                              ((context, animation, secondaryAnimation) =>
+                                  filterPage())));
+                    }, //필터링 연결(filter_page.dart)
                     icon: const Icon(
                       Icons.filter_list,
                       color: Colors.blue,
@@ -109,7 +115,31 @@ class _Home extends State<Home> {
           ),
           // 소그룹 목록
           Expanded(
-            child: ListView(children: [GroupList()]),
+            child: ListView.builder(
+                itemBuilder: (BuildContext context, int index) {
+              final firestore = FirebaseFirestore.instance;
+              getData() async {
+                final col = firestore
+                    .collection("group")
+                    .doc("0F4JQDIVXXhc4BM5PLJO")
+                    .withConverter(
+                      fromFirestore: GroupMeet.fromFirestore,
+                      toFirestore: (GroupMeet groupMeet, _) =>
+                          groupMeet.toFireStore(),
+                    );
+                final gp = await col.get();
+                final groupData = gp.data();
+                return GroupList(GroupMeet(
+                    title: "title",
+                    content: "content",
+                    dates: [DateTime.now()],
+                    maxGroup: index,
+                    lat: 10,
+                    lon: 10,
+                    tags: "tags"));
+                //GroupList(GroupMeet(gp.[index]["title"],gp.[index]["content"], gp.[index]["dates"],gp.[index]["maxGroup"],gp.[index]["location"][0],gp.[index]["location"][1],gp.[index]["tags"]));
+              }
+            }),
           )
         ],
       ),
