@@ -1,5 +1,7 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutterfire_ui/firestore.dart';
 
 import 'search.dart';
 import 'group_detail.dart';
@@ -10,25 +12,37 @@ import 'src/group.dart';
 
 //소그룹 리스트 항목 제공
 class GroupList extends StatelessWidget {
-  const GroupList(GroupMeet gp, {super.key});
+  GroupMeet gp;
+  GroupList(this.gp, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).push(PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                GroupDetail(this.gp)));
+      },
       title: Card(
           margin: const EdgeInsets.all(10.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text("Date"),
-              SizedBox(
+              Text(
+                gp.dates!.month.toString() + '/' + gp.dates!.day.toString(),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              ),
+              const SizedBox(
                 width: 15,
               ),
               Column(
                 children: [
-                  Text("title"),
-                  Text("Tags"),
+                  Text(
+                    gp.title!,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  Text(gp.tags!),
                 ],
               )
             ],
@@ -45,11 +59,24 @@ class Home extends StatefulWidget {
 }
 
 class _Home extends State<Home> {
-  final firestore = FirebaseFirestore.instance;
   int _index = 0;
 
   @override
   Widget build(BuildContext context) {
+    final groupQuery = FirebaseFirestore.instance
+        .collection('group')
+        .orderBy('dates')
+        .withConverter(
+          fromFirestore: GroupMeet.fromFirestore,
+          toFirestore: (GroupMeet group, option) => group.toFireStore(),
+        );
+    // List<GroupMeet> groupData = [];
+    // getData().then((List<GroupMeet> result) {
+    //   setState(() {
+    //     groupData = result;
+    //   });
+    // });
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       // 홈, 방 생성, 회원 정보 창 네비게이션바
@@ -68,18 +95,21 @@ class _Home extends State<Home> {
             if (value == 1) {
               Navigator.of(context).push(PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      GroupCreate()));
+                      const GroupCreate()));
             } else if (value == 2) {
               Navigator.of(context).push(PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      UserInfom()));
+                      const UserInfom()));
             }
           }),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text("Hob SPARCS"),
+            const Text(
+              "Hob SPARCS",
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
             Row(
               children: [
                 IconButton(
@@ -87,7 +117,7 @@ class _Home extends State<Home> {
                       Navigator.of(context).push(PageRouteBuilder(
                           pageBuilder:
                               ((context, animation, secondaryAnimation) =>
-                                  searchPage())));
+                                  const searchPage())));
                     },
                     icon: const Icon(
                       Icons.search,
@@ -98,7 +128,7 @@ class _Home extends State<Home> {
                       Navigator.of(context).push(PageRouteBuilder(
                           pageBuilder:
                               ((context, animation, secondaryAnimation) =>
-                                  filterPage())));
+                                  const filterPage())));
                     }, //필터링 연결(filter_page.dart)
                     icon: const Icon(
                       Icons.filter_list,
@@ -115,32 +145,14 @@ class _Home extends State<Home> {
           ),
           // 소그룹 목록
           Expanded(
-            child: ListView.builder(
-                itemBuilder: (BuildContext context, int index) {
-              final firestore = FirebaseFirestore.instance;
-              getData() async {
-                final col = firestore
-                    .collection("group")
-                    .doc("0F4JQDIVXXhc4BM5PLJO")
-                    .withConverter(
-                      fromFirestore: GroupMeet.fromFirestore,
-                      toFirestore: (GroupMeet groupMeet, _) =>
-                          groupMeet.toFireStore(),
-                    );
-                final gp = await col.get();
-                final groupData = gp.data();
-                return GroupList(GroupMeet(
-                    title: "title",
-                    content: "content",
-                    dates: [DateTime.now()],
-                    maxGroup: index,
-                    lat: 10,
-                    lon: 10,
-                    tags: "tags"));
-                //GroupList(GroupMeet(gp.[index]["title"],gp.[index]["content"], gp.[index]["dates"],gp.[index]["maxGroup"],gp.[index]["location"][0],gp.[index]["location"][1],gp.[index]["tags"]));
-              }
-            }),
-          )
+            child: FirestoreListView<GroupMeet>(
+              query: groupQuery,
+              itemBuilder: (context, snapshot) {
+                GroupMeet groupData = snapshot.data();
+                return GroupList(groupData);
+              },
+            ),
+          ),
         ],
       ),
     );

@@ -4,7 +4,7 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 
-import 'package:hobSparcs/home.dart';
+import 'package:hob_sparcs/home.dart';
 import 'user_info.dart';
 import 'src/group.dart';
 
@@ -19,18 +19,19 @@ class _GroupCreate extends State<GroupCreate> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
   static const cameraInitial = CameraPosition(
-      target: LatLng(36.374171854421185, 127.36037368774652), zoom: 15);
+    target: LatLng(37.42796133580664, -122.085749655962),
+    zoom: 14.4746,
+  );
+  final firestore = FirebaseFirestore.instance;
+  int _index = 1;
+  String _title = "";
+  String _content = "";
+  List<DateTime?> _dates = [DateTime.now()];
+  int _maxGroup = 1;
+  String _tags = "";
 
   @override
   Widget build(BuildContext context) {
-    final firestore = FirebaseFirestore.instance;
-    int _index = 1;
-    String _title = "";
-    String _content = "";
-    List<DateTime?> _dates = [DateTime.now()];
-    int _maxGroup = 1;
-    String _tags = "";
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       bottomNavigationBar: BottomNavigationBar(
@@ -97,10 +98,12 @@ class _GroupCreate extends State<GroupCreate> {
           //날짜
           CalendarDatePicker2(
             config: CalendarDatePicker2Config(
-              calendarType: CalendarDatePicker2Type.multi,
+              calendarType: CalendarDatePicker2Type.single,
             ),
             value: _dates,
-            onValueChanged: (dates) => _dates = dates,
+            onValueChanged: (dates) {
+              _dates = dates;
+            },
           ),
           //위치
           const Text("위치"),
@@ -131,12 +134,15 @@ class _GroupCreate extends State<GroupCreate> {
               GroupMeet newGroup = GroupMeet(
                   title: _title,
                   content: _content,
-                  dates: _dates,
+                  dates: _dates[0],
                   maxGroup: _maxGroup,
                   lat: 0,
                   lon: 0,
-                  tags: _tags);
-
+                  tags: _tags,
+                  creater: 131);
+              firestore.collection('group').add(newGroup.toFireStore()).then(
+                  (documentSnapshot) =>
+                      print("Added Data with ID: ${documentSnapshot.id}"));
               showDialog(
                   context: context,
                   builder: (context) {

@@ -1,4 +1,4 @@
-name: hobSparcs
+name: hob_sparcs
 description: Create & Join small hobby groups.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -41,6 +41,7 @@ dependencies:
   google_sign_in: ^5.4.4
   calendar_date_picker2: ^0.5.2
   google_maps_flutter: ^2.2.6
+  const_date_time: ^1.0.2
 
 dev_dependencies:
   flutter_test:

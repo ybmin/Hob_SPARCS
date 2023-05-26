@@ -17,7 +17,10 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -46,31 +49,20 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAYTFvu77GCSZp8ijRG8084mTxBm-Fb5ug',
-    appId: '1:553775054490:web:f0fcb7feb6b291bb15e923',
-    messagingSenderId: '553775054490',
-    projectId: 'hob-sparcs',
-    authDomain: 'hob-sparcs.firebaseapp.com',
-    storageBucket: 'hob-sparcs.appspot.com',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC5BcXe8J1O5AAMq5YzwiGIXHn4MMKAoVw',
-    appId: '1:553775054490:android:5c8b8d8df534db1b15e923',
-    messagingSenderId: '553775054490',
-    projectId: 'hob-sparcs',
-    storageBucket: 'hob-sparcs.appspot.com',
+    apiKey: 'AIzaSyDoDRhTUhRQzuHZyioipUT8c7emlhRWjkY',
+    appId: '1:332585436519:android:42a06c959ea1707edf1bc2',
+    messagingSenderId: '332585436519',
+    projectId: 'hobsparcs',
+    storageBucket: 'hobsparcs.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDODy6BbebeaFvodQ799_ywnqGjWwb94OY',
-    appId: '1:553775054490:ios:09a653b93557ec3c15e923',
-    messagingSenderId: '553775054490',
-    projectId: 'hob-sparcs',
-    storageBucket: 'hob-sparcs.appspot.com',
-    iosClientId:
-        '553775054490-a2td2ouficq83pbicf8ifh09fe71ufvg.apps.googleusercontent.com',
+    apiKey: 'AIzaSyD0MvEocJyU02rjRyuZXmoQoZG4H-qx27U',
+    appId: '1:332585436519:ios:f943870aa318a355df1bc2',
+    messagingSenderId: '332585436519',
+    projectId: 'hobsparcs',
+    storageBucket: 'hobsparcs.appspot.com',
     iosBundleId: 'com.example.application',
   );
 }

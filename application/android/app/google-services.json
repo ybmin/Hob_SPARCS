@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "553775054490",
-    "project_id": "hob-sparcs",
-    "storage_bucket": "hob-sparcs.appspot.com"
+    "project_number": "332585436519",
+    "project_id": "hobsparcs",
+    "storage_bucket": "hobsparcs.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:553775054490:android:5c8b8d8df534db1b15e923",
+        "mobilesdk_app_id": "1:332585436519:android:42a06c959ea1707edf1bc2",
         "android_client_info": {
           "package_name": "com.example.application"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "553775054490-0rn9r58e43u6cajmqecnig05s8ei1efu.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC5BcXe8J1O5AAMq5YzwiGIXHn4MMKAoVw"
+          "current_key": "AIzaSyDoDRhTUhRQzuHZyioipUT8c7emlhRWjkY"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "553775054490-0rn9r58e43u6cajmqecnig05s8ei1efu.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

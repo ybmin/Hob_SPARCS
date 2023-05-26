@@ -8,23 +8,25 @@ class searchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String _keyword;
     return Material(
       animationDuration: const Duration(milliseconds: 1000),
-      child: Text("Search Page"),
-      // child: Column(
-      //   children: [
-      //     Row(
-      //       children: [
-      //         const TextField(),
-      //         IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
-      //         IconButton(onPressed: () {}, icon: const Icon(Icons.filter_list)),
-      //       ],
-      //     ),
-      //     // Expanded(
-      //     //   child: ListView(),
-      //     // )
-      //   ],
-      // ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Text(
+                "Search",
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              ),
+              TextField(
+                onChanged: (keyword) => _keyword = keyword,
+              ),
+            ],
+          ),
+          /* 소모임 리스트 */
+        ],
+      ),
     );
   }
 }
