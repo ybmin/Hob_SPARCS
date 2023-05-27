@@ -10,11 +10,5 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  // FlutterFireUIAuth.configureProviders([
-  //   const EmailProviderConfiguration(),
-  //   const GoogleProviderConfiguration(clientId: clientId),
-  // ]);
-
   runApp(const App());
 }

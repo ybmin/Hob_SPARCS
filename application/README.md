@@ -4,9 +4,9 @@
 
 
 - main.dart
-- app.dart
+
 - user_info.dart
-: 계정 로그인 (보류)
+:
 본인이 만든 소모임 관리
 
 

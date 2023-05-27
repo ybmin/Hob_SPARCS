@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class GroupMeet {
   final String? title;
@@ -9,7 +10,7 @@ class GroupMeet {
   final double? lat;
   final double? lon;
   final String? tags;
-  final int? creater;
+  final String? creater;
   //필터링 대상용 추가 (경우에 따라 필요)
 
   GroupMeet(
@@ -34,10 +35,10 @@ class GroupMeet {
       dates: DateTime.fromMillisecondsSinceEpoch(
           data?["dates"].millisecondsSinceEpoch),
       maxGroup: data?["maxGroup"],
-      lat: data?["lat"],
-      lon: data?["lon"],
-      tags: data?["tags"],
-      creater: data?['creater'],
+      lat: double.parse(data!["lat"].toString()),
+      lon: double.parse(data["lon"].toString()),
+      tags: data["tags"],
+      creater: data['creater'],
     );
   }
 
@@ -55,4 +56,10 @@ class GroupMeet {
       if (creater != null) "creater": creater,
     };
   }
+}
+
+class JoinedUser {
+  final String? id;
+  final String? status;
+  JoinedUser(this.id, this.status);
 }

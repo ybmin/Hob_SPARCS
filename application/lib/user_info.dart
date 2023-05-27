@@ -1,11 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hob_sparcs/app.dart';
 import 'group_create.dart';
+import 'src/user.dart';
 import 'home.dart';
 
 class UserInfom extends StatefulWidget {
-  const UserInfom({super.key});
+  final UserName? userName;
+  const UserInfom(this.userName, {super.key});
 
   @override
   State<UserInfom> createState() => _UserInfom();
@@ -34,52 +37,61 @@ class _UserInfom extends State<UserInfom> {
               if (value == 0) {
                 Navigator.of(context).push(PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        Home()));
+                        Home(widget.userName)));
               } else if (value == 1) {
                 Navigator.of(context).push(PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        GroupCreate()));
+                        GroupCreate(widget.userName)));
               }
             }),
-        body: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircleAvatar(child: Icon(Icons.person)),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [Text("Name"), Text(user!.email.toString())],
-                ),
-              ],
-            ),
-            Container(
-              child: GestureDetector(
-                onTap: () {
-                  FirebaseAuth.instance.signOut();
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      PageRouteBuilder(pageBuilder:
-                          (context, animation, secondaryAnimation) {
-                        return App();
-                      }, transitionsBuilder: (BuildContext context,
-                          Animation<double> animation,
-                          Animation<double> secondaryAnimation,
-                          Widget child) {
-                        return new SlideTransition(
-                          position: new Tween<Offset>(
-                            begin: const Offset(1.0, 0.0),
-                            end: Offset.zero,
-                          ).animate(animation),
-                          child: child,
-                        );
-                      }),
-                      (route) => false);
-                },
-                child: Text("Log Out"),
+        body: Container(
+          alignment: Alignment.center,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircleAvatar(child: Icon(Icons.person)),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(widget.userName!.realName! +
+                          " (" +
+                          widget.userName!.nickName! +
+                          ")"),
+                      Text(user!.email.toString())
+                    ],
+                  ),
+                ],
               ),
-            )
-          ],
+              Container(
+                child: GestureDetector(
+                  onTap: () {
+                    FirebaseAuth.instance.signOut();
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        PageRouteBuilder(pageBuilder:
+                            (context, animation, secondaryAnimation) {
+                          return App();
+                        }, transitionsBuilder: (BuildContext context,
+                            Animation<double> animation,
+                            Animation<double> secondaryAnimation,
+                            Widget child) {
+                          return new SlideTransition(
+                            position: new Tween<Offset>(
+                              begin: const Offset(1.0, 0.0),
+                              end: Offset.zero,
+                            ).animate(animation),
+                            child: child,
+                          );
+                        }),
+                        (route) => false);
+                  },
+                  child: Text("Log Out"),
+                ),
+              )
+            ],
+          ),
         ));
   }
 }

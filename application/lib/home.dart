@@ -2,6 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutterfire_ui/firestore.dart';
+import 'package:flutter/services.dart';
+import 'package:hob_sparcs/src/user.dart';
 
 import 'search.dart';
 import 'group_detail.dart';
@@ -13,7 +15,10 @@ import 'src/group.dart';
 //소그룹 리스트 항목 제공
 class GroupList extends StatelessWidget {
   GroupMeet gp;
-  GroupList(this.gp, {super.key});
+  final String? id;
+  final UserName? userName;
+
+  GroupList(this.gp, this.id, this.userName, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +26,7 @@ class GroupList extends StatelessWidget {
       onTap: () {
         Navigator.of(context).push(PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                GroupDetail(this.gp)));
+                GroupDetail(gp, id, userName)));
       },
       title: Card(
           margin: const EdgeInsets.all(10.0),
@@ -52,7 +57,8 @@ class GroupList extends StatelessWidget {
 }
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  final UserName? userName;
+  const Home(this.userName, {super.key});
 
   @override
   State<Home> createState() => _Home();
@@ -63,6 +69,8 @@ class _Home extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
+        overlays: [SystemUiOverlay.top]);
     final groupQuery = FirebaseFirestore.instance
         .collection('group')
         .orderBy('dates')
@@ -88,11 +96,11 @@ class _Home extends State<Home> {
             if (value == 1) {
               Navigator.of(context).push(PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      const GroupCreate()));
+                      GroupCreate(widget.userName)));
             } else if (value == 2) {
               Navigator.of(context).push(PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      const UserInfom()));
+                      UserInfom(widget.userName)));
             }
           }),
       body: Column(
@@ -142,7 +150,8 @@ class _Home extends State<Home> {
               query: groupQuery,
               itemBuilder: (context, snapshot) {
                 GroupMeet groupData = snapshot.data();
-                return GroupList(groupData);
+
+                return GroupList(groupData, snapshot.id, widget.userName);
               },
             ),
           ),

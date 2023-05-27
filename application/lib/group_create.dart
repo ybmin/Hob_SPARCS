@@ -7,9 +7,11 @@ import 'dart:async';
 import 'package:hob_sparcs/home.dart';
 import 'user_info.dart';
 import 'src/group.dart';
+import 'src/user.dart';
 
 class GroupCreate extends StatefulWidget {
-  const GroupCreate({super.key});
+  final UserName? userName;
+  const GroupCreate(this.userName, {super.key});
 
   @override
   State<GroupCreate> createState() => _GroupCreate();
@@ -18,10 +20,11 @@ class GroupCreate extends StatefulWidget {
 class _GroupCreate extends State<GroupCreate> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
-  static const cameraInitial = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
+  static final CameraPosition _initialCameraPosition = CameraPosition(
+    target: LatLng(0, 0),
     zoom: 14.4746,
   );
+
   int _index = 1;
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
@@ -56,11 +59,11 @@ class _GroupCreate extends State<GroupCreate> {
             if (value == 0) {
               Navigator.of(context).push(PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      Home()));
+                      Home(widget.userName)));
             } else if (value == 2) {
               Navigator.of(context).push(PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      UserInfom()));
+                      UserInfom(widget.userName)));
             }
           }),
       body: SingleChildScrollView(
@@ -118,7 +121,7 @@ class _GroupCreate extends State<GroupCreate> {
             height: 300,
             width: 300,
             child: GoogleMap(
-              initialCameraPosition: cameraInitial,
+              initialCameraPosition: _initialCameraPosition,
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
               },
@@ -158,7 +161,7 @@ class _GroupCreate extends State<GroupCreate> {
                   lat: 0,
                   lon: 0,
                   tags: _tagsController.text.trim(),
-                  creater: 131);
+                  creater: widget.userName!.nickName);
               FirebaseFirestore.instance
                   .collection('group')
                   .add(newGroup.toFireStore())
