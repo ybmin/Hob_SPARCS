@@ -70,13 +70,6 @@ class _Home extends State<Home> {
           fromFirestore: GroupMeet.fromFirestore,
           toFirestore: (GroupMeet group, option) => group.toFireStore(),
         );
-    // List<GroupMeet> groupData = [];
-    // getData().then((List<GroupMeet> result) {
-    //   setState(() {
-    //     groupData = result;
-    //   });
-    // });
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       // 홈, 방 생성, 회원 정보 창 네비게이션바

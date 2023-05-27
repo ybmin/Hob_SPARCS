@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hob_sparcs/app.dart';
 import 'group_create.dart';
 import 'home.dart';
 
@@ -10,6 +12,8 @@ class UserInfom extends StatefulWidget {
 }
 
 class _UserInfom extends State<UserInfom> {
+  final user = FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
     int _index = 2;
@@ -45,10 +49,36 @@ class _UserInfom extends State<UserInfom> {
                 const CircleAvatar(child: Icon(Icons.person)),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [Text("Name"), Text("Id")],
-                )
+                  children: [Text("Name"), Text(user!.email.toString())],
+                ),
               ],
             ),
+            Container(
+              child: GestureDetector(
+                onTap: () {
+                  FirebaseAuth.instance.signOut();
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      PageRouteBuilder(pageBuilder:
+                          (context, animation, secondaryAnimation) {
+                        return App();
+                      }, transitionsBuilder: (BuildContext context,
+                          Animation<double> animation,
+                          Animation<double> secondaryAnimation,
+                          Widget child) {
+                        return new SlideTransition(
+                          position: new Tween<Offset>(
+                            begin: const Offset(1.0, 0.0),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        );
+                      }),
+                      (route) => false);
+                },
+                child: Text("Log Out"),
+              ),
+            )
           ],
         ));
   }

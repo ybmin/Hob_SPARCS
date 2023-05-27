@@ -16,12 +16,14 @@ class GroupDetail extends StatefulWidget {
 class _GroupDetail extends State<GroupDetail> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
-  static final cameraInitial = CameraPosition(
-      target: LatLng(widget.groupMeet.lat, widget.groupMeet.lon), zoom: 15);
-  String _status;
+  final _statusController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final cameraInitial = CameraPosition(
+        target: LatLng(widget.groupMeet!.lat!, widget.groupMeet!.lon!),
+        zoom: 15);
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       //찜하기 버튼
@@ -35,13 +37,13 @@ class _GroupDetail extends State<GroupDetail> {
         children: [
           //활동 제목
           Text(
-            widget.groupMeet.title,
+            widget.groupMeet!.title!,
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(
             height: 15,
           ),
-          Text(widget.groupMeet.content),
+          Text(widget.groupMeet!.content!),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -60,8 +62,8 @@ class _GroupDetail extends State<GroupDetail> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 // 상세 정보
                 children: [
-                  Text(widget.groupMeet.dates.toString()),
-                  Text(widget.groupMeet.tags),
+                  Text(widget.groupMeet!.dates.toString()),
+                  Text(widget.groupMeet!.tags!),
                 ],
               ),
             ],
@@ -71,7 +73,7 @@ class _GroupDetail extends State<GroupDetail> {
             height: 15,
           ),
           TextField(
-            onChanged: (status) => _status = status,
+            controller: _statusController,
           ),
           TextButton(
               onPressed: () {

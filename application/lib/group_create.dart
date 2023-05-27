@@ -22,13 +22,20 @@ class _GroupCreate extends State<GroupCreate> {
     target: LatLng(37.42796133580664, -122.085749655962),
     zoom: 14.4746,
   );
-  final firestore = FirebaseFirestore.instance;
   int _index = 1;
-  String _title = "";
-  String _content = "";
+  final _titleController = TextEditingController();
+  final _contentController = TextEditingController();
+  final _maxGroupController = TextEditingController(text: "1");
+  final _tagsController = TextEditingController();
   List<DateTime?> _dates = [DateTime.now()];
-  int _maxGroup = 1;
-  String _tags = "";
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _contentController.dispose();
+    _tagsController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +80,7 @@ class _GroupCreate extends State<GroupCreate> {
                 child: TextField(
                   key: null,
                   enabled: true,
-                  onChanged: (title) => _title = title,
+                  controller: _titleController,
                 ),
               ),
             ],
@@ -90,7 +97,7 @@ class _GroupCreate extends State<GroupCreate> {
                 minLines: null,
                 key: null,
                 enabled: true,
-                onChanged: (content) => _content = content,
+                controller: _contentController,
               ),
             ),
           ]),
@@ -117,6 +124,18 @@ class _GroupCreate extends State<GroupCreate> {
               },
             ),
           ),
+          //최대 인원
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+            const Text("최대 인원"),
+            SizedBox(
+              height: 30,
+              width: 250,
+              child: TextField(
+                controller: _maxGroupController,
+                keyboardType: TextInputType.number,
+              ),
+            ),
+          ]),
           //태그
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             const Text("태그"),
@@ -124,7 +143,7 @@ class _GroupCreate extends State<GroupCreate> {
               height: 30,
               width: 250,
               child: TextField(
-                onChanged: (tags) => _tags = tags,
+                controller: _tagsController,
               ),
             ),
           ]),
@@ -132,16 +151,18 @@ class _GroupCreate extends State<GroupCreate> {
           TextButton(
             onPressed: () {
               GroupMeet newGroup = GroupMeet(
-                  title: _title,
-                  content: _content,
+                  title: _titleController.text.trim(),
+                  content: _contentController.text.trim(),
                   dates: _dates[0],
-                  maxGroup: _maxGroup,
+                  maxGroup: int.parse(_maxGroupController.text.trim()),
                   lat: 0,
                   lon: 0,
-                  tags: _tags,
+                  tags: _tagsController.text.trim(),
                   creater: 131);
-              firestore.collection('group').add(newGroup.toFireStore()).then(
-                  (documentSnapshot) =>
+              FirebaseFirestore.instance
+                  .collection('group')
+                  .add(newGroup.toFireStore())
+                  .then((documentSnapshot) =>
                       print("Added Data with ID: ${documentSnapshot.id}"));
               showDialog(
                   context: context,
