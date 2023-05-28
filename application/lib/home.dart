@@ -42,11 +42,13 @@ class GroupList extends StatelessWidget {
                 children: [
                   Text(
                     gp.title!,
+                    softWrap: true,
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                   Text(
-                    gp.tags!,
+                    "#" + gp.tags!,
                     style: Theme.of(context).textTheme.bodyLarge,
+                    softWrap: true,
                   ),
                 ],
               )

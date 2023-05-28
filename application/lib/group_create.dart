@@ -71,188 +71,194 @@ class _GroupCreate extends State<GroupCreate> {
           }),
       body: Center(
         child: SingleChildScrollView(
-          child: Column(children: [
-            const SizedBox(
-              height: 40,
-            ),
-            Text(
-              "소모임 만들기",
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            //방  제목
-            Row(
+          child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                const SizedBox(
+                  height: 40,
+                ),
                 Text(
-                  "소모임 제목",
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white),
-                    color: Colors.black12,
-                  ),
-                  margin: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                  padding: EdgeInsets.symmetric(horizontal: 25, vertical: 32),
-                  height: 30,
-                  width: 250,
-                  child: TextField(
-                    decoration: InputDecoration(border: InputBorder.none),
-                    controller: _titleController,
-                  ),
-                ),
-              ],
-            ),
-            //상세설명
-            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-              Text(
-                "모임 소개",
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white),
-                  color: Colors.black12,
-                ),
-                margin: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 32),
-                height: 30,
-                width: 250,
-                child: TextField(
-                  decoration: InputDecoration(border: InputBorder.none),
-                  controller: _contentController,
-                ),
-              ),
-            ]),
-            //위치
-            TextButton(
-              child: Text("장소 지정하기: " + roadAddress,
-                  style: GoogleFonts.ibmPlexSansKr(
-                      color: Theme.of(context).indicatorColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20)),
-              onPressed: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => KpostalView(
-                      useLocalServer: false,
-                      kakaoKey: '9ee22b6ba29b8f3fe3289f29fb92f62b',
-                      callback: (Kpostal result) {
-                        setState(() {
-                          this.postCode = result.postCode;
-                          this.roadAddress = result.address;
-                          this.jibunAddress = result.jibunAddress;
-                          this.latitude = result.latitude.toString();
-                          this.longitude = result.longitude.toString();
-                          this.kakaoLatitude = result.kakaoLatitude.toString();
-                          this.kakaoLongitude =
-                              result.kakaoLongitude.toString();
-                        });
-                      },
-                    ),
-                  ),
-                );
-              },
-            ),
-            //날짜
-            CalendarDatePicker2(
-              config: CalendarDatePicker2Config(
-                calendarType: CalendarDatePicker2Type.single,
-              ),
-              value: _dates,
-              onValueChanged: (dates) => setState(() {
-                _dates = dates;
-              }),
-            ),
-            //최대 인원
-            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-              Text(
-                "최대 인원",
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white),
-                  color: Colors.black12,
-                ),
-                margin: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 32),
-                height: 30,
-                width: 250,
-                child: TextField(
-                  decoration: InputDecoration(border: InputBorder.none),
-                  controller: _maxGroupController,
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ]),
-            //태그
-            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-              Text(
-                "태그",
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white),
-                  color: Colors.black12,
-                ),
-                margin: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 32),
-                height: 30,
-                width: 250,
-                child: TextField(
-                  decoration: InputDecoration(border: InputBorder.none),
-                  controller: _tagsController,
-                ),
-              ),
-            ]),
-            const SizedBox(
-              height: 20,
-            ),
-            //등록
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white),
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 25),
-              child: TextButton(
-                onPressed: () {
-                  GroupMeet newGroup = GroupMeet(
-                      title: _titleController.text.trim(),
-                      content: _contentController.text.trim(),
-                      dates: _dates[0],
-                      maxGroup: int.parse(_maxGroupController.text.trim()),
-                      lat: double.parse(latitude),
-                      lon: double.parse(longitude),
-                      tags: _tagsController.text.trim(),
-                      creater: widget.userName!.nickName);
-                  FirebaseFirestore.instance
-                      .collection('group')
-                      .add(newGroup.toFireStore())
-                      .then((documentSnapshot) =>
-                          print("Added Data with ID: ${documentSnapshot.id}"));
-                  Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          Home(widget.userName)));
-                },
-                child: Text(
-                  "소모임 생성",
+                  "소모임 만들기",
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-              ),
-            ),
-          ]),
+                const SizedBox(
+                  height: 15,
+                ),
+                //방  제목
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      "소모임 제목",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Container(
+                      height: 50,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white),
+                        color: Colors.black12,
+                      ),
+                      child: TextField(
+                        decoration: InputDecoration(
+                            hintText: "스팍스 소모임 이름", border: InputBorder.none),
+                        controller: _titleController,
+                      ),
+                    ),
+                  ],
+                ),
+                //상세설명
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        "모임 소개",
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white),
+                          color: Colors.black12,
+                        ),
+                        height: 50,
+                        width: 200,
+                        child: TextField(
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "축구를 하니? 달리기를 하니?"),
+                          controller: _contentController,
+                        ),
+                      ),
+                    ]),
+                //위치
+                TextButton(
+                  child: Text("장소 지정하기: " + roadAddress,
+                      style: GoogleFonts.ibmPlexSansKr(
+                          color: Theme.of(context).indicatorColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20)),
+                  onPressed: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => KpostalView(
+                          useLocalServer: false,
+                          kakaoKey: '9ee22b6ba29b8f3fe3289f29fb92f62b',
+                          callback: (Kpostal result) {
+                            setState(() {
+                              this.postCode = result.postCode;
+                              this.roadAddress = result.address;
+                              this.jibunAddress = result.jibunAddress;
+                              this.latitude = result.latitude.toString();
+                              this.longitude = result.longitude.toString();
+                              this.kakaoLatitude =
+                                  result.kakaoLatitude.toString();
+                              this.kakaoLongitude =
+                                  result.kakaoLongitude.toString();
+                            });
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                //날짜
+                CalendarDatePicker2(
+                  config: CalendarDatePicker2Config(
+                    calendarType: CalendarDatePicker2Type.single,
+                  ),
+                  value: _dates,
+                  onValueChanged: (dates) => setState(() {
+                    _dates = dates;
+                  }),
+                ),
+                //최대 인원
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        "최대 인원",
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white),
+                          color: Colors.black12,
+                        ),
+                        height: 50,
+                        width: 200,
+                        child: TextField(
+                          decoration: InputDecoration(border: InputBorder.none),
+                          controller: _maxGroupController,
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                    ]),
+                //태그
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        "태그",
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white),
+                          color: Colors.black12,
+                        ),
+                        height: 50,
+                        width: 200,
+                        child: TextField(
+                          decoration: InputDecoration(
+                              border: InputBorder.none, hintText: "누구든지,아무나"),
+                          controller: _tagsController,
+                        ),
+                      ),
+                    ]),
+                const SizedBox(
+                  height: 20,
+                ),
+                //등록
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  child: TextButton(
+                    onPressed: () {
+                      GroupMeet newGroup = GroupMeet(
+                          title: _titleController.text.trim(),
+                          content: _contentController.text.trim(),
+                          dates: _dates[0],
+                          maxGroup: int.parse(_maxGroupController.text.trim()),
+                          lat: double.parse(latitude),
+                          lon: double.parse(longitude),
+                          tags: _tagsController.text.trim(),
+                          creater: widget.userName!.nickName);
+                      FirebaseFirestore.instance
+                          .collection('group')
+                          .add(newGroup.toFireStore())
+                          .then((documentSnapshot) => print(
+                              "Added Data with ID: ${documentSnapshot.id}"));
+                      Navigator.of(context).push(PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  Home(widget.userName)));
+                    },
+                    child: Text(
+                      "소모임 생성",
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                ),
+              ]),
         ),
       ),
     );

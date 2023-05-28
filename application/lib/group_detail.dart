@@ -127,14 +127,13 @@ class _GroupDetail extends State<GroupDetail> {
                 height: 40,
               ),
               //활동 제목
-              Text(
-                widget.groupMeet!.title!,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              Text(widget.groupMeet!.title!,
+                  style: Theme.of(context).textTheme.displaySmall),
               Container(
                   padding: EdgeInsets.symmetric(horizontal: 30),
                   alignment: Alignment.topRight,
-                  child: Text("방장: " + widget.groupMeet!.creater!)),
+                  child: Text("방장: " + widget.groupMeet!.creater!,
+                      style: Theme.of(context).textTheme.titleMedium)),
               const SizedBox(
                 height: 15,
               ),
@@ -143,26 +142,25 @@ class _GroupDetail extends State<GroupDetail> {
                 height: 15,
               ),
               Text(
-                widget.groupMeet!.dates!.year.toString() +
-                    "년 " +
-                    widget.groupMeet!.dates!.month.toString() +
-                    "월 " +
-                    widget.groupMeet!.dates!.day.toString() +
-                    "일 ",
-                softWrap: true,
-              ),
+                  widget.groupMeet!.dates!.year.toString() +
+                      "년 " +
+                      widget.groupMeet!.dates!.month.toString() +
+                      "월 " +
+                      widget.groupMeet!.dates!.day.toString() +
+                      "일 ",
+                  softWrap: true,
+                  style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(
                 height: 15,
               ),
               const Divider(color: Colors.grey),
-              Text(widget.groupMeet!.content!),
+              Text(widget.groupMeet!.content!,
+                  style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(
                 height: 10,
               ),
-              Text(
-                "#" + widget.groupMeet!.tags!,
-                softWrap: true,
-              ),
+              Text("#" + widget.groupMeet!.tags!,
+                  softWrap: true, style: Theme.of(context).textTheme.bodyLarge),
               const SizedBox(
                 height: 10,
               ),
@@ -192,9 +190,11 @@ class _GroupDetail extends State<GroupDetail> {
               FutureBuilder(
                 future: getData(),
                 builder: (context, snapshot) {
-                  return Text(userData.length.toString() +
-                      "/" +
-                      widget.groupMeet!.maxGroup!.toString());
+                  return Text(
+                      userData.length.toString() +
+                          "/" +
+                          widget.groupMeet!.maxGroup!.toString(),
+                      style: Theme.of(context).textTheme.titleLarge);
                 },
               ),
               Container(
@@ -224,62 +224,96 @@ class _GroupDetail extends State<GroupDetail> {
                 height: 15,
               ),
               Container(
-                alignment: Alignment.center,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white),
+                  color: Colors.black12,
+                ),
+                margin: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
                 child: TextField(
                   controller: _statusController,
-                  decoration: InputDecoration(hintText: "코멘트 추가(늦참, 준비물 등등)"),
+                  decoration: InputDecoration(
+                      border: InputBorder.none, hintText: "코멘트 추가(늦참, 준비물 등등)"),
                 ),
               ),
-              TextButton(
-                  onPressed: () {
-                    if (userData.length < widget.groupMeet!.maxGroup!) {
-                      for (var name in userData) {
-                        if (name.id == widget.userName!.nickName) {
-                          //이미 존재
-                        } else {
-                          //인원진에 포함
-                          addUser(_statusController.text.trim());
-                          Navigator.of(context).pop(false);
+              const SizedBox(
+                height: 20,
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 25),
+                child: TextButton(
+                    onPressed: () {
+                      if (userData.length < widget.groupMeet!.maxGroup!) {
+                        for (var name in userData) {
+                          if (name.id == widget.userName!.nickName) {
+                            //이미 존재
+                          } else {
+                            //인원진에 포함
+                            addUser(_statusController.text.trim());
+                            Navigator.of(context).pop(false);
+                          }
                         }
+                      } else {
+                        //인원 초과
                       }
-                    } else {
-                      //인원 초과
-                    }
-                    /*1. 인원 제한 확인
-                    2. firebase-group-ID-user에 이미 존재하는 id인지 확인하고 문서 작성*/
-                  },
-                  child: FutureBuilder(
-                    future: getData(),
-                    builder: (context, snapshot) {
-                      return (userData.length < widget.groupMeet!.maxGroup!)
-                          ? Text("참여하기")
-                          : Text("모집 마감된 소모임입니다.");
+                      /*1. 인원 제한 확인
+                      2. firebase-group-ID-user에 이미 존재하는 id인지 확인하고 문서 작성*/
                     },
-                  )),
-              FutureBuilder(
-                future: getData(),
-                builder: (context, snapshot) {
-                  if (widget.userName!.nickName == widget.groupMeet!.creater) {
-                    return TextButton(
-                        onPressed: () {
-                          deleteGroup();
-                          Navigator.of(context).pop(false);
-                        },
-                        child: Text("소모임 해산"));
-                  }
-                  for (var name in userData) {
-                    if (name.id == widget.userName!.nickName) {
+                    child: FutureBuilder(
+                      future: getData(),
+                      builder: (context, snapshot) {
+                        return (userData.length < widget.groupMeet!.maxGroup!)
+                            ? Text("참여하기",
+                                style: Theme.of(context).textTheme.titleMedium)
+                            : Text("모집 마감된 소모임입니다.",
+                                style: Theme.of(context).textTheme.titleMedium);
+                      },
+                    )),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 25),
+                child: FutureBuilder(
+                  future: getData(),
+                  builder: (context, snapshot) {
+                    if (widget.userName!.nickName ==
+                        widget.groupMeet!.creater) {
                       return TextButton(
                           onPressed: () {
-                            deleteUser();
+                            deleteGroup();
                             Navigator.of(context).pop(false);
                           },
-                          child: Text("소모임 취소"));
+                          child: Text("소모임 해산",
+                              style: Theme.of(context).textTheme.titleMedium));
                     }
-                  }
-                  return SizedBox(height: 0.1);
-                },
+                    for (var name in userData) {
+                      if (name.id == widget.userName!.nickName) {
+                        return TextButton(
+                            onPressed: () {
+                              deleteUser();
+                              Navigator.of(context).pop(false);
+                            },
+                            child: Text("소모임 취소",
+                                style:
+                                    Theme.of(context).textTheme.titleMedium));
+                      }
+                    }
+                    return SizedBox(height: 0.1);
+                  },
+                ),
               )
             ],
           ),
