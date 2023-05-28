@@ -113,97 +113,108 @@ class _UserInfom extends State<UserInfom> {
                         GroupCreate(widget.userName)));
               }
             }),
-        body: Container(
-          alignment: Alignment.center,
-          child: Column(
-            children: [
-              const SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircleAvatar(child: Icon(Icons.person)),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(widget.userName!.realName! +
-                          " (" +
-                          widget.userName!.nickName! +
-                          ")"),
-                      Text(user!.email.toString())
-                    ],
+        body: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const CircleAvatar(child: Icon(Icons.person)),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                            widget.userName!.realName! +
+                                " (" +
+                                widget.userName!.nickName! +
+                                ")",
+                            style: Theme.of(context).textTheme.titleMedium),
+                        Text(user!.email.toString(),
+                            style: Theme.of(context).textTheme.bodyLarge)
+                      ],
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white),
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 25),
+                      child: GestureDetector(
+                        onTap: () {
+                          FirebaseAuth.instance.signOut();
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              PageRouteBuilder(pageBuilder:
+                                  (context, animation, secondaryAnimation) {
+                                return App();
+                              }, transitionsBuilder: (BuildContext context,
+                                  Animation<double> animation,
+                                  Animation<double> secondaryAnimation,
+                                  Widget child) {
+                                return new SlideTransition(
+                                  position: new Tween<Offset>(
+                                    begin: const Offset(1.0, 0.0),
+                                    end: Offset.zero,
+                                  ).animate(animation),
+                                  child: child,
+                                );
+                              }),
+                              (route) => false);
+                        },
+                        child: Text("로그아웃",
+                            style: Theme.of(context).textTheme.titleMedium),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Divider(
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 10),
+                //내가 생성한 모임
+                Text("생성한 모임", style: Theme.of(context).textTheme.titleLarge),
+                Container(
+                  height: 300,
+                  child: FutureBuilder(
+                    future: getCreatedGroupData(),
+                    builder: (context, snapshot) {
+                      return ListView.builder(
+                          itemCount: createdGroupList.length,
+                          itemBuilder: (context, index) {
+                            return GroupList(createdGroupList[index],
+                                createdGroupIdList[index], widget.userName);
+                          });
+                    },
                   ),
-                ],
-              ),
-              Container(
-                child: GestureDetector(
-                  onTap: () {
-                    FirebaseAuth.instance.signOut();
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        PageRouteBuilder(pageBuilder:
-                            (context, animation, secondaryAnimation) {
-                          return App();
-                        }, transitionsBuilder: (BuildContext context,
-                            Animation<double> animation,
-                            Animation<double> secondaryAnimation,
-                            Widget child) {
-                          return new SlideTransition(
-                            position: new Tween<Offset>(
-                              begin: const Offset(1.0, 0.0),
-                              end: Offset.zero,
-                            ).animate(animation),
-                            child: child,
-                          );
-                        }),
-                        (route) => false);
-                  },
-                  child: Text("Log Out"),
                 ),
+                const SizedBox(height: 10),
+                const Divider(
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 10),
+
                 //참여중인 모임
-              ),
-              const SizedBox(height: 10),
-              const Divider(
-                color: Colors.grey,
-              ),
-              const SizedBox(height: 10),
-              //내가 생성한 모임
-              Text("생성한 모임"),
-              Container(
-                height: 300,
-                child: FutureBuilder(
-                  future: getCreatedGroupData(),
-                  builder: (context, snapshot) {
-                    return ListView.builder(
-                        itemCount: createdGroupList.length,
-                        itemBuilder: (context, index) {
-                          return GroupList(createdGroupList[index],
-                              createdGroupIdList[index], widget.userName);
-                        });
-                  },
+                Text("참가한 모임", style: Theme.of(context).textTheme.titleLarge),
+                Container(
+                  height: 300,
+                  child: FutureBuilder(
+                    future: getJoinGroupData(),
+                    builder: (context, snapshot) {
+                      return ListView.builder(
+                          itemCount: joinedGroupList.length,
+                          itemBuilder: (context, index) {
+                            return GroupList(joinedGroupList[index],
+                                joinedGroupIdList[index], widget.userName);
+                          });
+                    },
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              const Divider(
-                color: Colors.grey,
-              ),
-              const SizedBox(height: 10),
-              //내가 생성한 모임
-              Text("참가한 모임"),
-              Container(
-                height: 300,
-                child: FutureBuilder(
-                  future: getJoinGroupData(),
-                  builder: (context, snapshot) {
-                    return ListView.builder(
-                        itemCount: joinedGroupList.length,
-                        itemBuilder: (context, index) {
-                          return GroupList(joinedGroupList[index],
-                              joinedGroupIdList[index], widget.userName);
-                        });
-                  },
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ));
   }

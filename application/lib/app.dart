@@ -47,10 +47,18 @@ class _App extends State<App> {
           colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.amber, brightness: Brightness.light),
           primaryColor: Colors.amber,
+          iconButtonTheme: IconButtonThemeData(
+            style: ButtonStyle(),
+          ),
+          iconTheme: IconThemeData(color: Colors.amber, size: 20.0),
           textTheme: TextTheme(
               titleLarge: GoogleFonts.ibmPlexSansKr(
                   color: Colors.black, fontWeight: FontWeight.bold),
               titleMedium: GoogleFonts.ibmPlexSansKr(
+                  color: Colors.black, fontWeight: FontWeight.bold),
+              titleSmall: GoogleFonts.ibmPlexSansKr(
+                  color: Colors.black, fontWeight: FontWeight.bold),
+              displaySmall: GoogleFonts.ibmPlexSansKr(
                   color: Colors.black, fontWeight: FontWeight.bold),
               bodyMedium: TextStyle(
                 color: Colors.black,
@@ -58,6 +66,17 @@ class _App extends State<App> {
               displayMedium: GoogleFonts.ibmPlexSansKr(
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
+              )),
+          bottomNavigationBarTheme: BottomNavigationBarThemeData(
+              enableFeedback: true,
+              showUnselectedLabels: false,
+              selectedLabelStyle:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              backgroundColor: Colors.amber,
+              elevation: 1,
+              selectedIconTheme: IconThemeData(color: Colors.white, size: 40),
+              unselectedIconTheme: IconThemeData(
+                color: Colors.black45,
               )),
         ),
         home: StreamBuilder<User?>(

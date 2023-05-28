@@ -33,10 +33,7 @@ class _FilterPage extends State<FilterPage> {
             ),
             Text(
               "필터링",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 60),
+              style: Theme.of(context).textTheme.displaySmall,
             ),
             Container(
                 height: 400,
@@ -61,25 +58,47 @@ class _FilterPage extends State<FilterPage> {
                       ));
                     })),
             Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(
-                  child: Text("초기화하기"),
-                  onPressed: () {
-                    setState(() {
-                      _isChecked.clear();
-                      finalTags.clear();
-                      _isChecked = List.filled(widget.allTags.length, false,
-                          growable: true);
-                    });
-                  },
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  child: TextButton(
+                    child: Text("초기화하기",
+                        style: Theme.of(context).textTheme.titleMedium),
+                    onPressed: () {
+                      setState(() {
+                        _isChecked.clear();
+                        finalTags.clear();
+                        _isChecked = List.filled(widget.allTags.length, false,
+                            growable: true);
+                      });
+                    },
+                  ),
                 ),
-                TextButton(
-                  child: Text("필터링"),
-                  onPressed: () {
-                    widget.callback(finalTags, true);
-                    Navigator.of(context).pop();
-                  },
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  child: TextButton(
+                    child: Text("필터링",
+                        style: Theme.of(context).textTheme.titleMedium),
+                    onPressed: () {
+                      widget.callback(finalTags, true);
+                      Navigator.of(context).pop();
+                    },
+                  ),
                 ),
+                const SizedBox(
+                  width: 20,
+                )
               ],
             ),
           ],

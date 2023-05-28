@@ -33,10 +33,8 @@ class GroupList extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(
-                gp.dates!.month.toString() + '/' + gp.dates!.day.toString(),
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
+              Text(gp.dates!.month.toString() + '/' + gp.dates!.day.toString(),
+                  style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(
                 width: 15,
               ),
@@ -44,10 +42,12 @@ class GroupList extends StatelessWidget {
                 children: [
                   Text(
                     gp.title!,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 18),
+                    style: Theme.of(context).textTheme.titleSmall,
                   ),
-                  Text(gp.tags!),
+                  Text(
+                    gp.tags!,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
                 ],
               )
             ],
@@ -164,10 +164,7 @@ class _Home extends State<Home> {
             height: 30,
           ),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            const Text(
-              "Hob SPARCS",
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-            ),
+            Text("Hob SPARCS", style: Theme.of(context).textTheme.displaySmall),
             Row(
               children: [
                 IconButton(
@@ -182,9 +179,11 @@ class _Home extends State<Home> {
                                   secondaryAnimation) =>
                               SearchPage(groupList, groupIdList, userName))));
                     },
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.search,
-                      color: Colors.blue,
+                      color: Theme.of(context).primaryColor,
+                      size: 20,
+                      weight: 20,
                     )),
                 IconButton(
                     onPressed: () {
@@ -198,19 +197,24 @@ class _Home extends State<Home> {
                                         _finished = finished;
                                       }))));
                     }, //필터링 연결(filter_page.dart)
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.filter_list,
-                      color: Colors.blue,
+                      color: Theme.of(context).primaryColor,
+                      size: 20,
+                      weight: 20,
                     )),
               ],
             )
           ]),
+
           // 현재 필터링 정보
-          Row(
-            children: [
-              Text("filter info:" + tagFilter.toString()),
-            ],
+          Container(
+            alignment: Alignment.centerRight,
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Text("filter info:" + tagFilter.toString(),
+                style: Theme.of(context).textTheme.bodyLarge),
           ),
+
           // 소그룹 목록
           Expanded(
             child: FutureBuilder(
