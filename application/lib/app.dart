@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hob_sparcs/login_page.dart';
 import 'src/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'home.dart';
 
@@ -42,6 +43,23 @@ class _App extends State<App> {
         debugShowCheckedModeBanner: false,
         title: "Hob-SPARCS",
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.amber, brightness: Brightness.light),
+          primaryColor: Colors.amber,
+          textTheme: TextTheme(
+              titleLarge: GoogleFonts.ibmPlexSansKr(
+                  color: Colors.black, fontWeight: FontWeight.bold),
+              titleMedium: GoogleFonts.ibmPlexSansKr(
+                  color: Colors.black, fontWeight: FontWeight.bold),
+              bodyMedium: TextStyle(
+                color: Colors.black,
+              ),
+              displayMedium: GoogleFonts.ibmPlexSansKr(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              )),
+        ),
         home: StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
