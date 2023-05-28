@@ -1,8 +1,8 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutterfire_ui/firestore.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:hob_sparcs/app.dart';
 import 'package:hob_sparcs/src/user.dart';
 
 import 'search.dart';
@@ -66,16 +66,72 @@ class Home extends StatefulWidget {
 
 class _Home extends State<Home> {
   int _index = 0;
+  bool _finished = false;
+  List<GroupMeet> groupList = [];
+  List<String> groupIdList = [];
+  List<GroupMeet> finalGroupList = [];
+  List<String> finalGroupIdList = [];
+  List<String> tagFilter = [];
+
+  void showFilterOverlay(BuildContext context) {
+    OverlayState overlayState = Overlay.of(context);
+    OverlayEntry overlayEntry = OverlayEntry(builder: (context) {
+      return FilterPage(
+        tagSummary(),
+        callback: (value, finished) => setState(() {
+          tagFilter = value;
+          _finished = finished;
+        }),
+      );
+    });
+
+    overlayState.insert(overlayEntry);
+    if (_finished == true) {
+      overlayEntry.remove();
+    }
+  }
+
+  List<String> tagSummary() {
+    List<String> allTags = [];
+    for (var it in groupList) {
+      allTags.addAll(it.tags!.split(r'[ ,.]'));
+    }
+    //중복 제거
+    return allTags.toSet().toList();
+  }
+
+  Future getGroupData() async {
+    //그룹 데이터 가져오기
+    CollectionReference<Map<String, dynamic>> collectionReference =
+        FirebaseFirestore.instance.collection("group");
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await collectionReference.get();
+    groupList.clear();
+    groupIdList.clear();
+    for (var doc in querySnapshot.docs) {
+      final data = doc.data();
+      groupList.add(GroupMeet(
+        title: data["title"],
+        content: data["content"],
+        dates: DateTime.fromMillisecondsSinceEpoch(
+            data["dates"].millisecondsSinceEpoch),
+        maxGroup: data["maxGroup"],
+        lat: double.parse(data["lat"].toString()),
+        lon: double.parse(data["lon"].toString()),
+        tags: data["tags"],
+        creater: data['creater'],
+      ));
+      groupIdList.add(doc.id);
+    }
+    //필터링 및 검색 결과 종합 최종 리스트
+    finalGroupList = groupList;
+    finalGroupIdList = groupIdList;
+
+    return;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final groupQuery = FirebaseFirestore.instance
-        .collection('group')
-        .orderBy('dates')
-        .withConverter(
-          fromFirestore: GroupMeet.fromFirestore,
-          toFirestore: (GroupMeet group, option) => group.toFireStore(),
-        );
     return Scaffold(
       resizeToAvoidBottomInset: false,
       // 홈, 방 생성, 회원 정보 창 네비게이션바
@@ -116,10 +172,15 @@ class _Home extends State<Home> {
               children: [
                 IconButton(
                     onPressed: () {
+                      Future(
+                        () {
+                          getGroupData();
+                        },
+                      );
                       Navigator.of(context).push(PageRouteBuilder(
-                          pageBuilder:
-                              ((context, animation, secondaryAnimation) =>
-                                  const searchPage())));
+                          pageBuilder: ((context, animation,
+                                  secondaryAnimation) =>
+                              SearchPage(groupList, groupIdList, userName))));
                     },
                     icon: const Icon(
                       Icons.search,
@@ -127,10 +188,7 @@ class _Home extends State<Home> {
                     )),
                 IconButton(
                     onPressed: () {
-                      Navigator.of(context).push(PageRouteBuilder(
-                          pageBuilder:
-                              ((context, animation, secondaryAnimation) =>
-                                  const filterPage())));
+                      showFilterOverlay(context);
                     }, //필터링 연결(filter_page.dart)
                     icon: const Icon(
                       Icons.filter_list,
@@ -147,12 +205,15 @@ class _Home extends State<Home> {
           ),
           // 소그룹 목록
           Expanded(
-            child: FirestoreListView<GroupMeet>(
-              query: groupQuery,
-              itemBuilder: (context, snapshot) {
-                GroupMeet groupData = snapshot.data();
-
-                return GroupList(groupData, snapshot.id, widget.userName);
+            child: FutureBuilder(
+              future: getGroupData(),
+              builder: (context, snapshot) {
+                return ListView.builder(
+                    itemCount: finalGroupList.length,
+                    itemBuilder: (context, index) {
+                      return GroupList(finalGroupList[index],
+                          finalGroupIdList[index], widget.userName);
+                    });
               },
             ),
           ),
