@@ -17,22 +17,24 @@ class _FilterPage extends State<FilterPage> {
   @override
   void initState() {
     super.initState();
-    _isChecked = List<bool>.filled(widget.allTags.length, false);
+    _isChecked =
+        List<bool>.filled(widget.allTags.length, false, growable: true);
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
         alignment: Alignment.center,
-        margin: EdgeInsets.fromLTRB(50, 70, 50, 40),
-        padding: EdgeInsets.all(40),
-        color: Colors.black54,
+        color: Colors.white,
         child: Column(
           children: [
+            const SizedBox(
+              height: 40,
+            ),
             Text(
               "필터링",
               style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 60),
             ),
@@ -47,14 +49,14 @@ class _FilterPage extends State<FilterPage> {
                         title: Text(widget.allTags[index]),
                         value: _isChecked[index],
                         onChanged: (value) {
-                          setState() {
+                          setState(() {
                             _isChecked[index] = value!;
                             if (_isChecked[index] == true) {
                               finalTags.add(widget.allTags[index]);
                             } else {
                               finalTags.remove(widget.allTags[index]);
                             }
-                          }
+                          });
                         },
                       ));
                     })),
@@ -63,17 +65,19 @@ class _FilterPage extends State<FilterPage> {
                 TextButton(
                   child: Text("초기화하기"),
                   onPressed: () {
-                    setState() {
+                    setState(() {
                       _isChecked.clear();
                       finalTags.clear();
-                      _isChecked = List.filled(widget.allTags.length, false);
-                    }
+                      _isChecked = List.filled(widget.allTags.length, false,
+                          growable: true);
+                    });
                   },
                 ),
                 TextButton(
                   child: Text("필터링"),
                   onPressed: () {
                     widget.callback(finalTags, true);
+                    Navigator.of(context).pop();
                   },
                 ),
               ],

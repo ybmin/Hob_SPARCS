@@ -73,24 +73,6 @@ class _Home extends State<Home> {
   List<String> finalGroupIdList = [];
   List<String> tagFilter = [];
 
-  void showFilterOverlay(BuildContext context) {
-    OverlayState overlayState = Overlay.of(context);
-    OverlayEntry overlayEntry = OverlayEntry(builder: (context) {
-      return FilterPage(
-        tagSummary(),
-        callback: (value, finished) => setState(() {
-          tagFilter = value;
-          _finished = finished;
-        }),
-      );
-    });
-
-    overlayState.insert(overlayEntry);
-    if (_finished == true) {
-      overlayEntry.remove();
-    }
-  }
-
   List<String> tagSummary() {
     List<String> allTags = [];
     for (var it in groupList) {
@@ -123,11 +105,29 @@ class _Home extends State<Home> {
       ));
       groupIdList.add(doc.id);
     }
-    //필터링 및 검색 결과 종합 최종 리스트
-    finalGroupList = groupList;
-    finalGroupIdList = groupIdList;
+    finalGroupList.clear();
+    finalGroupIdList.clear();
+    if (tagFilter.isEmpty) {
+      finalGroupList.addAll(groupList);
+      finalGroupIdList.addAll(groupIdList);
+    } else {
+      searchGroupData();
+    }
+  }
 
-    return;
+  void searchGroupData() {
+    finalGroupList.clear();
+    finalGroupIdList.clear();
+    for (int index = 0; index < groupList.length; index++) {
+      for (var it in tagFilter) {
+        if ((groupList[index].tags!.contains(it))) {
+          finalGroupList.add(groupList[index]);
+          finalGroupIdList.add(groupIdList[index]);
+        }
+      }
+    }
+    finalGroupList.toSet().toList();
+    finalGroupIdList.toSet().toList();
   }
 
   @override
@@ -188,7 +188,15 @@ class _Home extends State<Home> {
                     )),
                 IconButton(
                     onPressed: () {
-                      showFilterOverlay(context);
+                      tagFilter.clear();
+                      Navigator.of(context).push(PageRouteBuilder(
+                          pageBuilder: (context, animation,
+                                  secondaryAnimation) =>
+                              FilterPage(tagSummary(),
+                                  callback: (value, finished) => setState(() {
+                                        tagFilter = value;
+                                        _finished = finished;
+                                      }))));
                     }, //필터링 연결(filter_page.dart)
                     icon: const Icon(
                       Icons.filter_list,
@@ -200,7 +208,7 @@ class _Home extends State<Home> {
           // 현재 필터링 정보
           Row(
             children: [
-              Text("filter info"),
+              Text("filter info:" + tagFilter.toString()),
             ],
           ),
           // 소그룹 목록

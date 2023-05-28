@@ -31,7 +31,6 @@ class _SearchPage extends State<SearchPage> {
         finalGroupIdList.add(widget.groupIdList[index]);
       }
     }
-    print("Search ${keywords}");
   }
 
   @override
