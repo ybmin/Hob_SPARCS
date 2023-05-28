@@ -25,9 +25,9 @@ class _GroupDetail extends State<GroupDetail> {
       Completer<GoogleMapController>();
   final _statusController = TextEditingController();
   final user = FirebaseAuth.instance.currentUser;
+  List<JoinedUser> userData = [];
 
-  Future<List<JoinedUser>> getData() async {
-    List<JoinedUser> userData = [];
+  Future getData() async {
     CollectionReference<Map<String, dynamic>> collectionReference =
         FirebaseFirestore.instance
             .collection("group")
@@ -35,13 +35,63 @@ class _GroupDetail extends State<GroupDetail> {
             .collection("user");
     QuerySnapshot<Map<String, dynamic>> querySnapshot =
         await collectionReference.get();
+    userData.clear();
+    userData.add(JoinedUser(widget.groupMeet!.creater!, "⭐방장⭐"));
     for (var doc in querySnapshot.docs) {
       final data = doc.data();
       userData.add(JoinedUser(data['id'], data['status']));
     }
-    return userData;
+    return;
   }
 
+  addUser(String status) async {
+    FirebaseFirestore.instance
+        .collection('group')
+        .doc(widget.id)
+        .collection('user')
+        .add({
+      'id': widget.userName!.nickName,
+      'realName': widget.userName!.realName,
+      'email': widget.userName!.id,
+      'status': status
+    }).then((documentSnapshot) =>
+            print("Added data with ID: ${documentSnapshot.id}"));
+  }
+
+  deleteUser() async {
+    CollectionReference<Map<String, dynamic>> collectionReference =
+        FirebaseFirestore.instance
+            .collection("group")
+            .doc(widget.id!)
+            .collection('user');
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await collectionReference.get();
+    var docId;
+    for (var doc in querySnapshot.docs) {
+      if (doc.data()["email"].toString() == user!.email.toString()) {
+        docId = doc.id;
+      }
+    }
+    FirebaseFirestore.instance
+        .collection("group")
+        .doc(widget.id!)
+        .collection('user')
+        .doc(docId)
+        .delete()
+        .then(
+          (doc) => print("Document deleted"),
+          onError: (e) => print("Error updating ${e}"),
+        );
+    return;
+  }
+
+  @override
+  void initState() {
+    getData();
+    super.initState();
+  }
+
+  @override
   void dispose() {
     _statusController.dispose();
     super.dispose();
@@ -52,41 +102,17 @@ class _GroupDetail extends State<GroupDetail> {
     final cameraInitial = CameraPosition(
         target: LatLng(widget.groupMeet!.lat!, widget.groupMeet!.lon!),
         zoom: 15);
-    List<JoinedUser> userData = [];
-    userData.add(JoinedUser(widget.groupMeet!.creater!, "⭐방장⭐"));
-    getData().then((List<JoinedUser> result) {
-      setState(() {
-        userData.addAll(result);
-      });
-    });
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text("소모임 상세 보기"),
         bottomOpacity: 0.0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_sharp),
-          onPressed: () {
-            Navigator.pushAndRemoveUntil(
-                context,
-                PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) {
-                  return Home(widget.userName);
-                }, transitionsBuilder: (BuildContext context,
-                        Animation<double> animation,
-                        Animation<double> secondaryAnimation,
-                        Widget child) {
-                  return new SlideTransition(
-                    position: new Tween<Offset>(
-                      begin: const Offset(1.0, 0.0),
-                      end: Offset.zero,
-                    ).animate(animation),
-                    child: child,
-                  );
-                }),
-                (route) => false);
-          },
-        ),
+            icon: Icon(Icons.arrow_back_ios_new_sharp),
+            onPressed: () {
+              Navigator.pop(context, false);
+            }),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -94,7 +120,7 @@ class _GroupDetail extends State<GroupDetail> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(
-                height: 40,
+                height: 10,
               ),
               //활동 제목
               Text(
@@ -159,25 +185,36 @@ class _GroupDetail extends State<GroupDetail> {
               const Divider(color: Colors.grey),
 
               //현재 join중인 사람들 목록
-              Text(userData.length.toString() +
-                  "/" +
-                  widget.groupMeet!.maxGroup!.toString()),
+              FutureBuilder(
+                future: getData(),
+                builder: (context, snapshot) {
+                  return Text(userData.length.toString() +
+                      "/" +
+                      widget.groupMeet!.maxGroup!.toString());
+                },
+              ),
               Container(
                 height: 100,
                 margin: EdgeInsets.all(5.0),
                 padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: ListView.builder(
-                    itemCount: userData.length,
-                    itemBuilder: ((context, index) {
-                      return Card(
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text(userData[index].id!),
-                              Text(userData[index].status!)
-                            ]),
-                      );
-                    })),
+                child: FutureBuilder(
+                  future: getData(),
+                  builder: (context, snapshot) {
+                    return ListView.builder(
+                        itemCount: userData.length,
+                        itemBuilder: ((context, index) {
+                          return Card(
+                            child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(userData[index].id!),
+                                  Text(userData[index].status!)
+                                ]),
+                          );
+                        }));
+                  },
+                ),
               ),
               const SizedBox(
                 height: 15,
@@ -198,6 +235,8 @@ class _GroupDetail extends State<GroupDetail> {
                           //이미 존재
                         } else {
                           //인원진에 포함
+                          addUser(_statusController.text.trim());
+                          Navigator.of(context).pop(false);
                         }
                       }
                     } else {
@@ -206,9 +245,30 @@ class _GroupDetail extends State<GroupDetail> {
                     /*1. 인원 제한 확인
                     2. firebase-group-ID-user에 이미 존재하는 id인지 확인하고 문서 작성*/
                   },
-                  child: (userData.length < widget.groupMeet!.maxGroup!)
-                      ? Text("참여하기")
-                      : Text("모집 마감된 소모임입니다."))
+                  child: FutureBuilder(
+                    future: getData(),
+                    builder: (context, snapshot) {
+                      return (userData.length < widget.groupMeet!.maxGroup!)
+                          ? Text("참여하기")
+                          : Text("모집 마감된 소모임입니다.");
+                    },
+                  )),
+              FutureBuilder(
+                future: getData(),
+                builder: (context, snapshot) {
+                  for (var name in userData) {
+                    if (name.id == widget.userName!.nickName) {
+                      return TextButton(
+                          onPressed: () {
+                            deleteUser();
+                            Navigator.of(context).pop(false);
+                          },
+                          child: Text("소모임 취소"));
+                    }
+                  }
+                  return SizedBox(height: 0.1);
+                },
+              )
             ],
           ),
         ),

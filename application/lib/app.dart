@@ -14,21 +14,27 @@ class App extends StatefulWidget {
   State<App> createState() => _App();
 }
 
+UserName userName = UserName("id", "realName", "nickName");
+
 class _App extends State<App> {
-  UserName userName = UserName("id", "realName", "nickName");
   Future getUserInfo() async {
     final user = FirebaseAuth.instance.currentUser;
     CollectionReference<Map<String, dynamic>> collectionReference =
-        FirebaseFirestore.instance.collection("user");
+        FirebaseFirestore.instance.collection("users");
     QuerySnapshot<Map<String, dynamic>> querySnapshot =
         await collectionReference.get();
     for (var doc in querySnapshot.docs) {
-      if (doc.data()["id"] == user!.email) {
-        userName = UserName(
-            doc.data()["id"], doc.data()["realName"], doc.data()["nickname"]);
+      if (doc.data()["email"].toString() == user!.email.toString()) {
+        userName = UserName(doc.data()["email"], doc.data()["realName"],
+            doc.data()["nickname"]);
       }
     }
     return;
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -41,8 +47,12 @@ class _App extends State<App> {
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                getUserInfo();
-                return Home(userName);
+                return FutureBuilder(
+                  future: getUserInfo(),
+                  builder: (context, snapshot) {
+                    return Home(userName);
+                  },
+                );
               } else {
                 return LoginPage();
               }
