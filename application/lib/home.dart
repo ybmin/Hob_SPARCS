@@ -69,8 +69,6 @@ class _Home extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
-        overlays: [SystemUiOverlay.top]);
     final groupQuery = FirebaseFirestore.instance
         .collection('group')
         .orderBy('dates')
@@ -106,6 +104,9 @@ class _Home extends State<Home> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
+          const SizedBox(
+            height: 30,
+          ),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             const Text(
               "Hob SPARCS",

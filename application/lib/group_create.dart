@@ -70,6 +70,9 @@ class _GroupCreate extends State<GroupCreate> {
           }),
       body: SingleChildScrollView(
         child: Column(children: [
+          const SizedBox(
+            height: 40,
+          ),
           const Text("소모임 만들기", style: TextStyle(fontSize: 20)),
           const SizedBox(
             height: 15,
@@ -97,9 +100,6 @@ class _GroupCreate extends State<GroupCreate> {
               height: 100,
               width: 250,
               child: TextField(
-                expands: true,
-                maxLines: null,
-                minLines: null,
                 key: null,
                 enabled: true,
                 controller: _contentController,
@@ -138,9 +138,9 @@ class _GroupCreate extends State<GroupCreate> {
               calendarType: CalendarDatePicker2Type.single,
             ),
             value: _dates,
-            onValueChanged: (dates) {
+            onValueChanged: (dates) => setState(() {
               _dates = dates;
-            },
+            }),
           ),
           //최대 인원
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
@@ -182,11 +182,9 @@ class _GroupCreate extends State<GroupCreate> {
                   .add(newGroup.toFireStore())
                   .then((documentSnapshot) =>
                       print("Added Data with ID: ${documentSnapshot.id}"));
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return const Dialog(child: Text("Create!!!"));
-                  });
+              Navigator.of(context).push(PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      Home(widget.userName)));
             },
             child: const Text("소모임 생성"),
           ),

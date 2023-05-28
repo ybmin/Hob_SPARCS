@@ -27,6 +27,7 @@ class _GroupDetail extends State<GroupDetail> {
   final user = FirebaseAuth.instance.currentUser;
   List<JoinedUser> userData = [];
 
+  //참여 인원 파악
   Future getData() async {
     CollectionReference<Map<String, dynamic>> collectionReference =
         FirebaseFirestore.instance
@@ -85,6 +86,18 @@ class _GroupDetail extends State<GroupDetail> {
     return;
   }
 
+  deleteGroup() async {
+    FirebaseFirestore.instance
+        .collection("group")
+        .doc(widget.id!)
+        .delete()
+        .then(
+          (doc) => print("Document deleted"),
+          onError: (e) => print("Error updating ${e}"),
+        );
+    return;
+  }
+
   @override
   void initState() {
     getData();
@@ -105,22 +118,13 @@ class _GroupDetail extends State<GroupDetail> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Text("소모임 상세 보기"),
-        bottomOpacity: 0.0,
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new_sharp),
-            onPressed: () {
-              Navigator.pop(context, false);
-            }),
-      ),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(
-                height: 10,
+                height: 40,
               ),
               //활동 제목
               Text(
@@ -256,6 +260,14 @@ class _GroupDetail extends State<GroupDetail> {
               FutureBuilder(
                 future: getData(),
                 builder: (context, snapshot) {
+                  if (widget.userName!.nickName == widget.groupMeet!.creater) {
+                    return TextButton(
+                        onPressed: () {
+                          deleteGroup();
+                          Navigator.of(context).pop(false);
+                        },
+                        child: Text("소모임 해산"));
+                  }
                   for (var name in userData) {
                     if (name.id == widget.userName!.nickName) {
                       return TextButton(
