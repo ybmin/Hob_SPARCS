@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:async';
+import 'package:kpostal/kpostal.dart';
 
 import 'package:hob_sparcs/home.dart';
 import 'user_info.dart';
@@ -18,18 +18,19 @@ class GroupCreate extends StatefulWidget {
 }
 
 class _GroupCreate extends State<GroupCreate> {
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
-  static final CameraPosition _initialCameraPosition = CameraPosition(
-    target: LatLng(0, 0),
-    zoom: 14.4746,
-  );
-
   int _index = 1;
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
   final _maxGroupController = TextEditingController(text: "1");
   final _tagsController = TextEditingController();
+  final _placeController = TextEditingController();
+  String postCode = '-';
+  String roadAddress = ' ';
+  String jibunAddress = '-';
+  String latitude = '-';
+  String longitude = '-';
+  String kakaoLatitude = '-';
+  String kakaoLongitude = '-';
   List<DateTime?> _dates = [DateTime.now()];
 
   @override
@@ -37,6 +38,7 @@ class _GroupCreate extends State<GroupCreate> {
     _titleController.dispose();
     _contentController.dispose();
     _tagsController.dispose();
+    _placeController.dispose();
     super.dispose();
   }
 
@@ -104,7 +106,32 @@ class _GroupCreate extends State<GroupCreate> {
               ),
             ),
           ]),
-          //카테고리
+          //위치
+          TextButton(
+            child: Text("장소 지정하기: " + roadAddress),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => KpostalView(
+                    useLocalServer: false,
+                    kakaoKey: '9ee22b6ba29b8f3fe3289f29fb92f62b',
+                    callback: (Kpostal result) {
+                      setState(() {
+                        this.postCode = result.postCode;
+                        this.roadAddress = result.address;
+                        this.jibunAddress = result.jibunAddress;
+                        this.latitude = result.latitude.toString();
+                        this.longitude = result.longitude.toString();
+                        this.kakaoLatitude = result.kakaoLatitude.toString();
+                        this.kakaoLongitude = result.kakaoLongitude.toString();
+                      });
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
           //날짜
           CalendarDatePicker2(
             config: CalendarDatePicker2Config(
@@ -114,18 +141,6 @@ class _GroupCreate extends State<GroupCreate> {
             onValueChanged: (dates) {
               _dates = dates;
             },
-          ),
-          //위치
-          const Text("위치"),
-          SizedBox(
-            height: 300,
-            width: 300,
-            child: GoogleMap(
-              initialCameraPosition: _initialCameraPosition,
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-              },
-            ),
           ),
           //최대 인원
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
@@ -158,8 +173,8 @@ class _GroupCreate extends State<GroupCreate> {
                   content: _contentController.text.trim(),
                   dates: _dates[0],
                   maxGroup: int.parse(_maxGroupController.text.trim()),
-                  lat: 0,
-                  lon: 0,
+                  lat: double.parse(latitude),
+                  lon: double.parse(longitude),
                   tags: _tagsController.text.trim(),
                   creater: widget.userName!.nickName);
               FirebaseFirestore.instance

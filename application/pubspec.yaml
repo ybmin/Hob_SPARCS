@@ -40,9 +40,10 @@ dependencies:
   flutterfire_ui: ^0.4.3+20
   google_sign_in: ^5.4.4
   calendar_date_picker2: ^0.5.2
-  google_maps_flutter: ^2.2.6
+  google_maps_flutter: ^2.2.8
   const_date_time: ^1.0.2
-
+  google_fonts:
+  kpostal:
 dev_dependencies:
   flutter_test:
     sdk: flutter
